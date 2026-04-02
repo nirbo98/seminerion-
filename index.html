@@ -678,11 +678,13 @@ function startPhotos() {
   document.getElementById('photoIntro').style.display = 'none';
   document.getElementById('photoViewer').style.display = 'flex';
 
-  // Randomize order
+  // Randomize order (skip if ?debug=1 in URL)
   photoOrder = [...Array(photos.length).keys()];
-  for (let i = photoOrder.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [photoOrder[i], photoOrder[j]] = [photoOrder[j], photoOrder[i]];
+  if (!new URLSearchParams(window.location.search).get('debug')) {
+    for (let i = photoOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [photoOrder[i], photoOrder[j]] = [photoOrder[j], photoOrder[i]];
+    }
   }
   DATA.photo_order = photoOrder.map(i => photos[i].desc);
   
