@@ -53,7 +53,7 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
 .photo-progress-bar{height:100%;background:#fff;transition:width .1s linear;border-radius:3px}
 .photo-counter{position:relative;z-index:2;font-size:13px;color:rgba(255,255,255,.7)}
 .photo-timer{position:absolute;top:16px;left:16px;background:rgba(0,0,0,.6);color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600;z-index:2}
-#photoCaption{position:absolute;bottom:60px;left:0;right:0;z-index:2;color:#fff;font-style:italic;font-size:14px;text-align:center;padding:8px 24px;background:linear-gradient(transparent,rgba(0,0,0,.75));}
+#photoCaption{display:none}
 
 /* ===== DEQ ===== */
 .deq-item{padding:16px 0;border-bottom:1px solid var(--border)}
@@ -706,7 +706,7 @@ function showPhoto() {
   img.src = photo.file;
 
   document.getElementById('photoCounter').textContent = `תמונה ${currentPhoto + 1} מתוך ${photos.length}`;
-  document.getElementById('photoCaption').textContent = photo.desc || '';
+
 
   let timeLeft = 10;
   document.getElementById('photoTimer').textContent = timeLeft;
@@ -1015,31 +1015,39 @@ async function saveToSheets() {
 async function showResults() {
   DATA.timestamp_end = new Date().toISOString();
 
-  document.getElementById('finalScore').textContent = DATA.simulation.compliance_score + '/10';
+  try {
+    const sim = DATA.simulation || {};
+    const deq = (DATA.deq && DATA.deq.subscales) || {};
+    const mc = DATA.manipulation_check || {};
 
-  const summary = document.getElementById('resultsSummary');
-  summary.innerHTML = `
-    <div class="result-row"><span>שיעור ציות</span><strong>${DATA.simulation.compliance_rate}</strong></div>
-    <div class="result-row"><span>פרודים שהתקבלו</span><strong>${DATA.simulation.prods_received}</strong></div>
-    <div class="result-row"><span>זמן סימולציה</span><strong>${DATA.simulation.total_duration_sec} שניות</strong></div>
-    <div class="result-row"><span>פחד (DEQ)</span><strong>${DATA.deq.subscales?.fear_mean || '—'}</strong></div>
-    <div class="result-row"><span>כעס (DEQ)</span><strong>${DATA.deq.subscales?.anger_mean || '—'}</strong></div>
-    <div class="result-row"><span>גועל (DEQ)</span><strong>${DATA.deq.subscales?.disgust_mean || '—'}</strong></div>
-    <div class="result-row"><span>עצב (DEQ)</span><strong>${DATA.deq.subscales?.sadness_mean || '—'}</strong></div>
-    <div class="result-row"><span>השפעת תמונות (דיווח עצמי)</span><strong>${DATA.manipulation_check.photo_impact}/5</strong></div>
-    <div class="result-row"><span>זיהה קשר?</span><strong>${DATA.manipulation_check.suspected_connection}</strong></div>
-  `;
+    document.getElementById('finalScore').textContent = (sim.compliance_score ?? '—') + '/10';
+
+    const summary = document.getElementById('resultsSummary');
+    summary.innerHTML = `
+      <div class="result-row"><span>שיעור ציות</span><strong>${sim.compliance_rate || '—'}</strong></div>
+      <div class="result-row"><span>פרודים שהתקבלו</span><strong>${sim.prods_received ?? '—'}</strong></div>
+      <div class="result-row"><span>זמן סימולציה</span><strong>${sim.total_duration_sec || '—'} שניות</strong></div>
+      <div class="result-row"><span>פחד (DEQ)</span><strong>${deq.fear_mean || '—'}</strong></div>
+      <div class="result-row"><span>כעס (DEQ)</span><strong>${deq.anger_mean || '—'}</strong></div>
+      <div class="result-row"><span>גועל (DEQ)</span><strong>${deq.disgust_mean || '—'}</strong></div>
+      <div class="result-row"><span>עצב (DEQ)</span><strong>${deq.sadness_mean || '—'}</strong></div>
+      <div class="result-row"><span>השפעת תמונות (1-5)</span><strong>${mc.photo_impact || '—'}</strong></div>
+      <div class="result-row"><span>זיהה קשר?</span><strong>${mc.suspected_connection || '—'}</strong></div>
+    `;
+  } catch(err) {
+    console.error('showResults error:', err);
+  }
 
   goTo('phase-results');
 
-  // שמירה ברקע — לא חוסמת את הממשק
+  // שמירה ברקע
   const statusEl = document.getElementById('saveStatus');
   statusEl.textContent = '⏳ שומר נתונים...';
   saveToSheets().then(result => {
     DATA.sheets_save = result;
-    statusEl.textContent = result.status === 'sent'
-      ? '✅ הנתונים נשמרו'
-      : '⚠️ שגיאה בשמירה';
+    statusEl.textContent = result.status === 'sent' ? '✅ הנתונים נשמרו' : '⚠️ שגיאה בשמירה';
+  }).catch(() => {
+    statusEl.textContent = '⚠️ שגיאה בשמירה';
   });
 }
 
