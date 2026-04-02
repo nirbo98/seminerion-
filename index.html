@@ -188,8 +188,8 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
 
     <div class="info-box" style="text-align:right;margin:20px 0 8px">
       <strong>על התמונות שתצפה/י בהן:</strong><br>
-      התמונות נלקחו מ<em>אלבום אושוויץ</em> (1944) — המסמך הצילומי היחיד הידוע המתעד הגעה ומיון של יהודים
-      ל-Birkenau. האלבום גולה בידי ניצולה, Lili Jacob, לאחר שחרור מחנה דורה ב-1945 והועבר ליד ושם.<br><br>
+      התמונות הן תיעוד היסטורי מתקופת השואה, חלקן מ<em>אלבום אושוויץ</em> (1944) — המסמך הצילומי
+      היחיד הידוע המתעד הגעה ומיון של יהודים ל-Birkenau (גולה בידי ניצולה Lili Jacob, 1945).<br><br>
       <strong>נימוק הבחירה:</strong> התמונות נבחרו מפני שהן מתעדות תהליך שבו אנשים ציוו על ידי סמכות לבצע
       פעולות — בדיוק ההקשר שהמחקר הנוכחי בוחן. הצפייה בהן נועדת לעורר תגובה רגשית אותנטית הקשורה
       לנושא הציות לסמכות.
@@ -208,6 +208,7 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
     </div>
     <div class="photo-progress"><div class="photo-progress-bar" id="photoProgressBar"></div></div>
     <div class="photo-counter" id="photoCounter"></div>
+    <div id="photoCaption" style="max-width:700px;width:100%;margin-top:10px;text-align:center;font-size:13px;color:var(--muted);font-style:italic;min-height:20px"></div>
   </div>
 </div>
 </div>
@@ -714,6 +715,7 @@ function showPhoto() {
   img.src = photo.file;
 
   document.getElementById('photoCounter').textContent = `תמונה ${currentPhoto + 1} מתוך ${photos.length}`;
+  document.getElementById('photoCaption').textContent = photo.desc || '';
 
   let timeLeft = 10;
   document.getElementById('photoTimer').textContent = timeLeft;
