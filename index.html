@@ -999,11 +999,12 @@ function submitDemo() {
 async function saveToSheets() {
   if (!SHEETS_WEBHOOK_URL) return { status: 'skipped', reason: 'no_url_configured' };
   try {
+    const body = new URLSearchParams();
+    body.append('payload', JSON.stringify(DATA));
     await fetch(SHEETS_WEBHOOK_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(DATA)
+      body: body
     });
     return { status: 'sent', time: new Date().toISOString() };
   } catch (e) {
