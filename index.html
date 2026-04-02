@@ -219,7 +219,7 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
 <div class="wrap">
   <div class="card">
     <h2>שאלון תגובות רגשיות</h2>
-    <p>עד כמה כל אחד מהרגשות הבאים מתאר את מה שהרגשת <strong>בזמן הצפייה בתמונות</strong>?<br>סמן/י מ-1 (לא בכלל) עד 7 (מאוד).</p>
+    <p>עד כמה כל אחד מהרגשות הבאים מתאר את מה שהרגשת <strong>בזמן הצפייה בתמונות</strong>?<br>סמן/י מ-1 (לא בכלל) עד 5 (מאוד).</p>
     <div id="deqItems"></div>
     <button class="btn btn-primary btn-full" style="margin-top:20px" onclick="submitDEQ()">המשך →</button>
   </div>
@@ -745,7 +745,7 @@ function buildDEQ() {
     <div class="deq-item">
       <div class="deq-label">${item.label}</div>
       <div class="deq-scale">
-        ${[1,2,3,4,5,6,7].map(v => `
+        ${[1,2,3,4,5].map(v => `
           <label class="deq-radio">
             <input type="radio" name="deq_${item.id}" value="${v}">
             <span class="dot">${v}</span>
