@@ -1015,19 +1015,6 @@ async function saveToSheets() {
 async function showResults() {
   DATA.timestamp_end = new Date().toISOString();
 
-  // שמירה ב-Google Sheets (אם מוגדר URL)
-  const statusEl = document.getElementById('saveStatus');
-  if (SHEETS_WEBHOOK_URL) {
-    statusEl.textContent = '⏳ שומר נתונים...';
-    DATA.sheets_save = await saveToSheets();
-    statusEl.textContent = DATA.sheets_save.status === 'sent'
-      ? '✅ הנתונים נשמרו ב-Google Sheets'
-      : `⚠️ שגיאה בשמירה: ${DATA.sheets_save.message || DATA.sheets_save.reason}`;
-  } else {
-    DATA.sheets_save = { status: 'skipped', reason: 'no_url_configured' };
-    statusEl.textContent = '⚠️ Google Sheets לא מוגדר — הורד JSON ידנית';
-  }
-
   document.getElementById('finalScore').textContent = DATA.simulation.compliance_score + '/10';
 
   const summary = document.getElementById('resultsSummary');
@@ -1039,12 +1026,21 @@ async function showResults() {
     <div class="result-row"><span>כעס (DEQ)</span><strong>${DATA.deq.subscales?.anger_mean || '—'}</strong></div>
     <div class="result-row"><span>גועל (DEQ)</span><strong>${DATA.deq.subscales?.disgust_mean || '—'}</strong></div>
     <div class="result-row"><span>עצב (DEQ)</span><strong>${DATA.deq.subscales?.sadness_mean || '—'}</strong></div>
-    <div class="result-row"><span>השפעת תמונות (דיווח עצמי)</span><strong>${DATA.manipulation_check.photo_impact}/7</strong></div>
+    <div class="result-row"><span>השפעת תמונות (דיווח עצמי)</span><strong>${DATA.manipulation_check.photo_impact}/5</strong></div>
     <div class="result-row"><span>זיהה קשר?</span><strong>${DATA.manipulation_check.suspected_connection}</strong></div>
   `;
 
-  document.getElementById('jsonOutput').textContent = JSON.stringify(DATA, null, 2);
   goTo('phase-results');
+
+  // שמירה ברקע — לא חוסמת את הממשק
+  const statusEl = document.getElementById('saveStatus');
+  statusEl.textContent = '⏳ שומר נתונים...';
+  saveToSheets().then(result => {
+    DATA.sheets_save = result;
+    statusEl.textContent = result.status === 'sent'
+      ? '✅ הנתונים נשמרו'
+      : '⚠️ שגיאה בשמירה';
+  });
 }
 
 function copyAll() {
