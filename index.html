@@ -198,6 +198,31 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
 </div>
 </div>
 
+<!-- ==================== PHASE 2B: PHOTO DESCRIPTION ==================== -->
+<div class="phase" id="phase-photo-desc" style="align-items:flex-start;padding-top:40px">
+<div class="wrap">
+  <div class="card">
+    <h2>על התמונות שראית</h2>
+    <div class="info-box">
+      ℹ️ התמונות שהוצגו לך לקוחות מתוך <strong>"אלבום אושוויץ"</strong> (The Auschwitz Album) — האלבום הצילומי היחיד ששרד מתהליך ההשמדה במחנה אושוויץ-בירקנאו, המתעד את הגעת יהודי הונגריה למחנה בקיץ 1944.<br><br>
+      האלבום צולם ככל הנראה על ידי אנשי SS, ומתעד את תהליך ה"סלקציה" — מיון האנשים לעבודת כפייה או למוות מיידי בתאי הגזים. התמונות נבחרו במכוון כדי לייצג את ההיבטים השונים של התהליך: הגעה, סלקציה, הפרדת משפחות, וציות המוני לפקודות.
+    </div>
+
+    <div class="form-group">
+      <label>לדעתך, מה הרגש המרכזי שהתמונות עוררו אצלך?</label>
+      <textarea id="photo_desc_emotion" rows="2" placeholder="תאר/י במילים שלך..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>האם תוכל/י לתאר תמונה אחת שבלטה מבחינתך במיוחד? מדוע?</label>
+      <textarea id="photo_desc_salient" rows="3" placeholder="תאר/י את התמונה ואת הסיבה שבלטה..."></textarea>
+    </div>
+
+    <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="submitPhotoDesc()">המשך לשאלון →</button>
+  </div>
+</div>
+</div>
+
 <!-- ==================== PHASE 3: DEQ ==================== -->
 <div class="phase" id="phase-deq" style="align-items:flex-start;padding-top:40px">
 <div class="wrap">
@@ -453,6 +478,8 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
       <div class="json-box" id="jsonOutput"></div>
     </div>
     
+    <div id="sheetsStatus" style="text-align:center;font-size:14px;font-weight:600;margin-top:16px;padding:12px;background:var(--bg);border-radius:8px"></div>
+
     <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="copyAll()">📋 העתק JSON</button>
     <button class="btn btn-outline btn-full" style="margin-top:8px" onclick="downloadJSON()">💾 הורד כקובץ</button>
     <button class="btn btn-outline btn-full" style="margin-top:8px" onclick="restart()">🔄 הרץ מחדש</button>
@@ -469,12 +496,53 @@ const DATA = {
   timestamp_end: null,
   condition: 'experimental', // or 'control'
   photo_order: [],
+  photo_description: {},
   deq: {},
   filler: {},
   simulation: { steps: [], compliance_score: 0 },
   manipulation_check: {},
-  demographics: {}
+  demographics: {},
+  timestamps: {
+    consent: null,
+    photos_start: null,
+    photos_end: null,
+    photo_desc_start: null,
+    photo_desc_end: null,
+    deq_start: null,
+    deq_end: null,
+    filler_start: null,
+    filler_end: null,
+    sim_start: null,
+    sim_end: null,
+    manip_start: null,
+    manip_end: null,
+    demo_start: null,
+    demo_end: null
+  }
 };
+
+// ==================== GOOGLE SHEETS API ====================
+const GOOGLE_SHEETS_URL = ''; // הכנס כאן את כתובת ה-Web App של Google Apps Script
+
+async function sendToGoogleSheets(data) {
+  if (!GOOGLE_SHEETS_URL) {
+    console.warn('Google Sheets URL not configured. Data saved locally only.');
+    return { success: false, reason: 'no_url' };
+  }
+  try {
+    const response = await fetch(GOOGLE_SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    console.log('Data sent to Google Sheets successfully.');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to send data to Google Sheets:', error);
+    return { success: false, reason: error.message };
+  }
+}
 
 // ==================== PHOTOS ====================
 const photos = [
@@ -629,6 +697,7 @@ function startStudy() {
     return;
   }
   DATA.timestamp_start = new Date().toISOString();
+  DATA.timestamps.consent = new Date().toISOString();
   goTo('phase-photos');
 }
 
@@ -636,7 +705,8 @@ function startStudy() {
 function startPhotos() {
   document.getElementById('photoIntro').style.display = 'none';
   document.getElementById('photoViewer').style.display = 'flex';
-  
+  DATA.timestamps.photos_start = new Date().toISOString();
+
   // Randomize order
   photoOrder = [...Array(photos.length).keys()];
   for (let i = photoOrder.length - 1; i > 0; i--) {
@@ -651,8 +721,9 @@ function startPhotos() {
 
 function showPhoto() {
   if (currentPhoto >= photos.length) {
-    goTo('phase-deq');
-    buildDEQ();
+    DATA.timestamps.photos_end = new Date().toISOString();
+    DATA.timestamps.photo_desc_start = new Date().toISOString();
+    goTo('phase-photo-desc');
     return;
   }
   
@@ -683,6 +754,21 @@ function showPhoto() {
       setTimeout(showPhoto, 500);
     }
   }, 100);
+}
+
+// ==================== PHASE 2B: PHOTO DESCRIPTION ====================
+function submitPhotoDesc() {
+  const emotion = document.getElementById('photo_desc_emotion').value.trim();
+  const salient = document.getElementById('photo_desc_salient').value.trim();
+  if (!emotion || !salient) { alert('אנא ענה/י על שתי השאלות.'); return; }
+  DATA.photo_description = {
+    central_emotion: emotion,
+    salient_photo: salient
+  };
+  DATA.timestamps.photo_desc_end = new Date().toISOString();
+  DATA.timestamps.deq_start = new Date().toISOString();
+  goTo('phase-deq');
+  buildDEQ();
 }
 
 // ==================== PHASE 3: DEQ ====================
@@ -730,6 +816,8 @@ function submitDEQ() {
   }
   
   DATA.deq = { items: deqData, subscales: means };
+  DATA.timestamps.deq_end = new Date().toISOString();
+  DATA.timestamps.filler_start = new Date().toISOString();
   goTo('phase-filler');
   buildFiller();
 }
@@ -753,6 +841,7 @@ function submitFiller() {
     fillerData[`word_${i + 1}`] = { prefix: w.prefix, completion: val, full: w.prefix + val };
   });
   DATA.filler = fillerData;
+  DATA.timestamps.filler_end = new Date().toISOString();
   goTo('phase-sim-intro');
 }
 
@@ -762,6 +851,7 @@ function startSim() {
   simStep = 0;
   simResponses = [];
   simStartTime = Date.now();
+  DATA.timestamps.sim_start = new Date().toISOString();
   updateProgress();
   showSimStep(0);
 }
@@ -885,6 +975,7 @@ function simAction(idx, action) {
 }
 
 function endSim() {
+  DATA.timestamps.sim_end = new Date().toISOString();
   const score = simResponses.filter(r => r.action === 'comply').length;
   DATA.simulation = {
     compliance_score: score,
@@ -895,7 +986,10 @@ function endSim() {
     steps: simResponses
   };
   
-  setTimeout(() => goTo('phase-manip'), 500);
+  setTimeout(() => {
+    DATA.timestamps.manip_start = new Date().toISOString();
+    goTo('phase-manip');
+  }, 500);
 }
 
 // ==================== PHASE 7: MANIPULATION CHECK ====================
@@ -913,7 +1007,8 @@ function submitManip() {
     suspected_connection: connection,
     connection_explanation: document.getElementById('manip_explain')?.value || ''
   };
-  
+  DATA.timestamps.manip_end = new Date().toISOString();
+  DATA.timestamps.demo_start = new Date().toISOString();
   goTo('phase-demo');
 }
 
@@ -929,18 +1024,38 @@ function submitDemo() {
     study_year: document.getElementById('demo_year').value,
     ethnicity: document.getElementById('demo_ethnicity').value,
     memorial_visit: document.getElementById('demo_memorial').value,
-    survivor_relation: document.getElementById('demo_survivor').value
+    survivor_relation: document.getElementById('demo_survivor').value,
+    holocaust_family_connection: document.getElementById('demo_survivor').value
   };
-  
+  DATA.timestamps.demo_end = new Date().toISOString();
   goTo('phase-debrief');
 }
 
 // ==================== PHASE 9-10: RESULTS ====================
-function showResults() {
+async function showResults() {
   DATA.timestamp_end = new Date().toISOString();
-  
+
+  // Calculate phase durations for distraction filtering
+  const ts = DATA.timestamps;
+  DATA.phase_durations = {};
+  const pairs = [
+    ['photos', 'photos_start', 'photos_end'],
+    ['photo_desc', 'photo_desc_start', 'photo_desc_end'],
+    ['deq', 'deq_start', 'deq_end'],
+    ['filler', 'filler_start', 'filler_end'],
+    ['simulation', 'sim_start', 'sim_end'],
+    ['manip_check', 'manip_start', 'manip_end'],
+    ['demographics', 'demo_start', 'demo_end']
+  ];
+  pairs.forEach(([name, start, end]) => {
+    if (ts[start] && ts[end]) {
+      DATA.phase_durations[name + '_seconds'] = ((new Date(ts[end]) - new Date(ts[start])) / 1000).toFixed(1);
+    }
+  });
+  DATA.phase_durations.total_seconds = ((new Date(DATA.timestamp_end) - new Date(DATA.timestamp_start)) / 1000).toFixed(1);
+
   document.getElementById('finalScore').textContent = DATA.simulation.compliance_score + '/10';
-  
+
   const summary = document.getElementById('resultsSummary');
   summary.innerHTML = `
     <div class="result-row"><span>שיעור ציות</span><strong>${DATA.simulation.compliance_rate}</strong></div>
@@ -952,9 +1067,29 @@ function showResults() {
     <div class="result-row"><span>עצב (DEQ)</span><strong>${DATA.deq.subscales?.sadness_mean || '—'}</strong></div>
     <div class="result-row"><span>השפעת תמונות (דיווח עצמי)</span><strong>${DATA.manipulation_check.photo_impact}/7</strong></div>
     <div class="result-row"><span>זיהה קשר?</span><strong>${DATA.manipulation_check.suspected_connection}</strong></div>
+    <div class="result-row"><span>זמן כולל</span><strong>${DATA.phase_durations.total_seconds} שניות</strong></div>
   `;
-  
+
   document.getElementById('jsonOutput').textContent = JSON.stringify(DATA, null, 2);
+
+  // Send data to Google Sheets
+  const sheetsStatus = document.getElementById('sheetsStatus');
+  if (GOOGLE_SHEETS_URL) {
+    sheetsStatus.textContent = '⏳ שולח נתונים למאגר...';
+    sheetsStatus.style.color = 'var(--warning)';
+    const result = await sendToGoogleSheets(DATA);
+    if (result.success) {
+      sheetsStatus.textContent = '✅ הנתונים נשמרו בהצלחה במאגר הנתונים.';
+      sheetsStatus.style.color = 'var(--success)';
+    } else {
+      sheetsStatus.textContent = '⚠️ לא ניתן היה לשלוח למאגר. אנא הורד/י את הקובץ ידנית.';
+      sheetsStatus.style.color = 'var(--danger)';
+    }
+  } else {
+    sheetsStatus.textContent = 'ℹ️ מאגר נתונים חיצוני לא הוגדר. אנא הורד/י את הנתונים ידנית.';
+    sheetsStatus.style.color = 'var(--muted)';
+  }
+
   goTo('phase-results');
 }
 
