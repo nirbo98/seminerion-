@@ -185,7 +185,21 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
   <div class="card" id="photoIntro" style="text-align:center;padding:40px">
     <h2>חלק א׳ — צפייה בתמונות</h2>
     <p>כעת יוצגו בפניך 8 תמונות היסטוריות.<br>כל תמונה תוצג למשך 10 שניות.<br>אנא התבונן/י בכל תמונה בתשומת לב.</p>
-    <button class="btn btn-primary" onclick="startPhotos()" style="margin-top:16px">התחל צפייה</button>
+
+    <div class="info-box" style="text-align:right;margin:20px 0 8px">
+      <strong>על התמונות שתצפה/י בהן:</strong><br>
+      התמונות נלקחו מ<em>אלבום אושוויץ</em> (1944) — המסמך הצילומי היחיד הידוע המתעד הגעה ומיון של יהודים
+      ל-Birkenau. האלבום גולה בידי ניצולה, Lili Jacob, לאחר שחרור מחנה דורה ב-1945 והועבר ליד ושם.<br><br>
+      <strong>נימוק הבחירה:</strong> התמונות נבחרו מפני שהן מתעדות תהליך שבו אנשים ציוו על ידי סמכות לבצע
+      פעולות — בדיוק ההקשר שהמחקר הנוכחי בוחן. הצפייה בהן נועדת לעורר תגובה רגשית אותנטית הקשורה
+      לנושא הציות לסמכות.
+    </div>
+
+    <div class="note-box" style="text-align:right;margin:0 0 16px">
+      ⚠️ התמונות עלולות לעורר מצוקה רגשית. ההמשך הינו מרצון לחלוטין.
+    </div>
+
+    <button class="btn btn-primary" onclick="startPhotos()" style="margin-top:8px">התחל צפייה</button>
   </div>
   <div class="photo-viewer" id="photoViewer" style="display:none">
     <div class="photo-frame">
@@ -456,12 +470,33 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
     <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="copyAll()">📋 העתק JSON</button>
     <button class="btn btn-outline btn-full" style="margin-top:8px" onclick="downloadJSON()">💾 הורד כקובץ</button>
     <button class="btn btn-outline btn-full" style="margin-top:8px" onclick="restart()">🔄 הרץ מחדש</button>
+    <div id="saveStatus" style="margin-top:14px;text-align:center;font-size:13px;color:var(--muted)"></div>
   </div>
 </div>
 </div>
 
 
 <script>
+// ==================== GOOGLE SHEETS CONFIG ====================
+/*
+  לשמירה ב-Google Sheets, צור Apps Script חדש בגיליון Google שלך:
+  1. פתח גיליון חדש ב-Google Sheets
+  2. Extensions > Apps Script
+  3. מחק את הקוד הקיים והדבק:
+
+     function doPost(e) {
+       const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+       const data = JSON.parse(e.postData.contents);
+       sheet.appendRow([new Date(), JSON.stringify(data)]);
+       return ContentService.createTextOutput('ok');
+     }
+
+  4. שמור > Deploy > New deployment > Web App
+  5. "Who has access" → Anyone
+  6. העתק את ה-URL לתוך המשתנה למטה
+*/
+const SHEETS_WEBHOOK_URL = ''; // הכנס כאן את ה-URL של Apps Script Web App
+
 // ==================== DATA STORE ====================
 const DATA = {
   participant_id: 'P_' + Date.now(),
@@ -469,11 +504,26 @@ const DATA = {
   timestamp_end: null,
   condition: 'experimental', // or 'control'
   photo_order: [],
+  photo_response_times: [],
+  phase_timestamps: {
+    photos_start: null,
+    photos_end: null,
+    deq_start: null,
+    deq_end: null,
+    filler_start: null,
+    filler_end: null,
+    sim_end: null,
+    manip_start: null,
+    manip_end: null,
+    demo_start: null,
+    demo_end: null
+  },
   deq: {},
   filler: {},
   simulation: { steps: [], compliance_score: 0 },
   manipulation_check: {},
-  demographics: {}
+  demographics: {},
+  sheets_save: null
 };
 
 // ==================== PHOTOS ====================
@@ -634,9 +684,10 @@ function startStudy() {
 
 // ==================== PHASE 2: PHOTOS ====================
 function startPhotos() {
+  DATA.phase_timestamps.photos_start = new Date().toISOString();
   document.getElementById('photoIntro').style.display = 'none';
   document.getElementById('photoViewer').style.display = 'flex';
-  
+
   // Randomize order
   photoOrder = [...Array(photos.length).keys()];
   for (let i = photoOrder.length - 1; i > 0; i--) {
@@ -651,34 +702,41 @@ function startPhotos() {
 
 function showPhoto() {
   if (currentPhoto >= photos.length) {
+    DATA.phase_timestamps.photos_end = new Date().toISOString();
     goTo('phase-deq');
     buildDEQ();
     return;
   }
-  
+
   const idx = photoOrder[currentPhoto];
   const photo = photos[idx];
   const img = document.getElementById('photoImg');
   img.src = photo.file;
-  
+
   document.getElementById('photoCounter').textContent = `תמונה ${currentPhoto + 1} מתוך ${photos.length}`;
-  
+
   let timeLeft = 10;
   document.getElementById('photoTimer').textContent = timeLeft;
   document.getElementById('photoProgressBar').style.width = '0%';
-  
+
   let elapsed = 0;
+  const photoShowStart = Date.now();
   clearInterval(photoTimerInterval);
   photoTimerInterval = setInterval(() => {
     elapsed += 100;
     const pct = (elapsed / 10000) * 100;
     document.getElementById('photoProgressBar').style.width = pct + '%';
-    
+
     const secs = Math.ceil((10000 - elapsed) / 1000);
     document.getElementById('photoTimer').textContent = secs;
-    
+
     if (elapsed >= 10000) {
       clearInterval(photoTimerInterval);
+      DATA.photo_response_times.push({
+        photo: photo.desc,
+        shown_at: new Date(photoShowStart).toISOString(),
+        viewed_ms: Date.now() - photoShowStart
+      });
       currentPhoto++;
       setTimeout(showPhoto, 500);
     }
@@ -687,6 +745,7 @@ function showPhoto() {
 
 // ==================== PHASE 3: DEQ ====================
 function buildDEQ() {
+  DATA.phase_timestamps.deq_start = new Date().toISOString();
   const container = document.getElementById('deqItems');
   // Shuffle DEQ items for presentation
   const shuffled = [...deqItems].sort(() => Math.random() - 0.5);
@@ -729,6 +788,7 @@ function submitDEQ() {
     means[key + '_items'] = vals;
   }
   
+  DATA.phase_timestamps.deq_end = new Date().toISOString();
   DATA.deq = { items: deqData, subscales: means };
   goTo('phase-filler');
   buildFiller();
@@ -736,6 +796,7 @@ function submitDEQ() {
 
 // ==================== PHASE 4: FILLER ====================
 function buildFiller() {
+  DATA.phase_timestamps.filler_start = new Date().toISOString();
   const container = document.getElementById('fillerItems');
   container.innerHTML = fillerWords.map((w, i) => `
     <div class="filler-word">
@@ -752,6 +813,7 @@ function submitFiller() {
     const val = document.getElementById(`filler_${i}`).value.trim();
     fillerData[`word_${i + 1}`] = { prefix: w.prefix, completion: val, full: w.prefix + val };
   });
+  DATA.phase_timestamps.filler_end = new Date().toISOString();
   DATA.filler = fillerData;
   goTo('phase-sim-intro');
 }
@@ -886,6 +948,7 @@ function simAction(idx, action) {
 
 function endSim() {
   const score = simResponses.filter(r => r.action === 'comply').length;
+  DATA.phase_timestamps.sim_end = new Date().toISOString();
   DATA.simulation = {
     compliance_score: score,
     max_possible: 10,
@@ -894,7 +957,8 @@ function endSim() {
     total_duration_sec: ((Date.now() - simStartTime) / 1000).toFixed(1),
     steps: simResponses
   };
-  
+
+  DATA.phase_timestamps.manip_start = new Date().toISOString();
   setTimeout(() => goTo('phase-manip'), 500);
 }
 
@@ -908,12 +972,14 @@ function submitManip() {
   const connection = document.getElementById('manip_connection').value;
   if (!impact || !connection) { alert('אנא ענה/י על כל השאלות.'); return; }
   
+  DATA.phase_timestamps.manip_end = new Date().toISOString();
   DATA.manipulation_check = {
     photo_impact: parseInt(impact.value),
     suspected_connection: connection,
     connection_explanation: document.getElementById('manip_explain')?.value || ''
   };
-  
+
+  DATA.phase_timestamps.demo_start = new Date().toISOString();
   goTo('phase-demo');
 }
 
@@ -923,6 +989,7 @@ function submitDemo() {
   const gender = document.getElementById('demo_gender').value;
   if (!age || !gender) { alert('אנא מלא/י גיל ומגדר לפחות.'); return; }
   
+  DATA.phase_timestamps.demo_end = new Date().toISOString();
   DATA.demographics = {
     age: parseInt(age),
     gender,
@@ -931,16 +998,45 @@ function submitDemo() {
     memorial_visit: document.getElementById('demo_memorial').value,
     survivor_relation: document.getElementById('demo_survivor').value
   };
-  
+
   goTo('phase-debrief');
 }
 
+// ==================== GOOGLE SHEETS SAVE ====================
+async function saveToSheets() {
+  if (!SHEETS_WEBHOOK_URL) return { status: 'skipped', reason: 'no_url_configured' };
+  try {
+    await fetch(SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(DATA)
+    });
+    return { status: 'sent', time: new Date().toISOString() };
+  } catch (e) {
+    return { status: 'error', message: e.message };
+  }
+}
+
 // ==================== PHASE 9-10: RESULTS ====================
-function showResults() {
+async function showResults() {
   DATA.timestamp_end = new Date().toISOString();
-  
+
+  // שמירה ב-Google Sheets (אם מוגדר URL)
+  const statusEl = document.getElementById('saveStatus');
+  if (SHEETS_WEBHOOK_URL) {
+    statusEl.textContent = '⏳ שומר נתונים...';
+    DATA.sheets_save = await saveToSheets();
+    statusEl.textContent = DATA.sheets_save.status === 'sent'
+      ? '✅ הנתונים נשמרו ב-Google Sheets'
+      : `⚠️ שגיאה בשמירה: ${DATA.sheets_save.message || DATA.sheets_save.reason}`;
+  } else {
+    DATA.sheets_save = { status: 'skipped', reason: 'no_url_configured' };
+    statusEl.textContent = '⚠️ Google Sheets לא מוגדר — הורד JSON ידנית';
+  }
+
   document.getElementById('finalScore').textContent = DATA.simulation.compliance_score + '/10';
-  
+
   const summary = document.getElementById('resultsSummary');
   summary.innerHTML = `
     <div class="result-row"><span>שיעור ציות</span><strong>${DATA.simulation.compliance_rate}</strong></div>
@@ -953,7 +1049,7 @@ function showResults() {
     <div class="result-row"><span>השפעת תמונות (דיווח עצמי)</span><strong>${DATA.manipulation_check.photo_impact}/7</strong></div>
     <div class="result-row"><span>זיהה קשר?</span><strong>${DATA.manipulation_check.suspected_connection}</strong></div>
   `;
-  
+
   document.getElementById('jsonOutput').textContent = JSON.stringify(DATA, null, 2);
   goTo('phase-results');
 }
