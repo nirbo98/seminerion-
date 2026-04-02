@@ -973,20 +973,37 @@ function submitDemo() {
 }
 
 // ==================== GOOGLE SHEETS SAVE ====================
-async function saveToSheets() {
-  if (!SHEETS_WEBHOOK_URL) return { status: 'skipped', reason: 'no_url_configured' };
-  try {
-    const body = new URLSearchParams();
-    body.append('payload', JSON.stringify(DATA));
-    await fetch(SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: body
-    });
-    return { status: 'sent', time: new Date().toISOString() };
-  } catch (e) {
-    return { status: 'error', message: e.message };
-  }
+function saveToSheets() {
+  if (!SHEETS_WEBHOOK_URL) return Promise.resolve({ status: 'skipped' });
+  return new Promise((resolve) => {
+    try {
+      const iframe = document.createElement('iframe');
+      iframe.name = 'sf_' + Date.now();
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = SHEETS_WEBHOOK_URL;
+      form.target = iframe.name;
+      form.style.display = 'none';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'payload';
+      input.value = JSON.stringify(DATA);
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        try { document.body.removeChild(form); document.body.removeChild(iframe); } catch(e) {}
+        resolve({ status: 'sent' });
+      }, 3000);
+    } catch(e) {
+      resolve({ status: 'error', message: e.message });
+    }
+  });
 }
 
 // ==================== PHASE 9-10: RESULTS ====================
