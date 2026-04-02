@@ -373,16 +373,7 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
         <option value="prefer_not">מעדיף/ה לא לציין</option>
       </select>
     </div>
-    <div class="form-group">
-      <label>שנת לימודים</label>
-      <select id="demo_year">
-        <option value="">בחר/י...</option>
-        <option value="1">שנה א׳</option>
-        <option value="2">שנה ב׳</option>
-        <option value="3">שנה ג׳</option>
-        <option value="grad">תואר שני</option>
-      </select>
-    </div>
+
 
     <div class="form-group">
       <label>האם ביקרת אי פעם באתר הנצחה של השואה (יד ושם, מחנה ריכוז וכו׳)?</label>
@@ -977,7 +968,6 @@ function submitDemo() {
   DATA.demographics = {
     age: parseInt(age),
     gender,
-    study_year: document.getElementById('demo_year').value,
     memorial_visit: document.getElementById('demo_memorial').value,
     survivor_relation: document.getElementById('demo_survivor').value
   };
