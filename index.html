@@ -216,7 +216,7 @@ p,.desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:12px}
 <div class="wrap">
   <div class="card">
     <h2>שאלון תגובות רגשיות</h2>
-    <p>עד כמה כל אחד מהרגשות הבאים מתאר את מה שהרגשת <strong>בזמן הצפייה בתמונות</strong>?<br>סמן/י מ-1 (לא בכלל) עד 5 (מאוד).</p>
+    <p>עד כמה כל אחד מהרגשות הבאים מתאר את מה שהרגשת <strong>בזמן הצפייה בתמונות</strong>?<br>סמן/י מ-1 (לא בכלל) עד 7 (מאוד).</p>
     <div id="deqItems"></div>
     <button class="btn btn-primary btn-full" style="margin-top:20px" onclick="submitDEQ()">המשך →</button>
   </div>
@@ -513,40 +513,38 @@ let photoTimerInterval = null;
 
 // ==================== DEQ ITEMS ====================
 const deqItems = [
-  { id: 'fear_1', label: 'מפוחד/ת', subscale: 'fear' },
-  { id: 'anger_1', label: 'כועס/ת', subscale: 'anger' },
-  { id: 'disgust_1', label: 'נגעל/ת', subscale: 'disgust' },
-  { id: 'sad_1', label: 'עצוב/ה', subscale: 'sadness' },
-  { id: 'fear_2', label: 'חושש/ת', subscale: 'fear' },
-  { id: 'anger_2', label: 'זועם/ת', subscale: 'anger' },
-  { id: 'disgust_2', label: 'סולד/ת', subscale: 'disgust' },
-  { id: 'sad_2', label: 'מרגיש/ה אבל', subscale: 'sadness' },
-  { id: 'fear_3', label: 'מבוהל/ת', subscale: 'fear' },
-  { id: 'anger_3', label: 'מתמרמר/ת', subscale: 'anger' },
-  { id: 'disgust_3', label: 'חש/ה בחילה', subscale: 'disgust' },
-  { id: 'sad_3', label: 'נכאב/ת', subscale: 'sadness' },
-  { id: 'fear_4', label: 'חש/ה אימה', subscale: 'fear' },
-  { id: 'anger_4', label: 'נסער/ת', subscale: 'anger' },
-  { id: 'disgust_4', label: 'חש/ה דחייה', subscale: 'disgust' },
-  { id: 'sad_4', label: 'שבור/ה', subscale: 'sadness' },
-  { id: 'fear_5', label: 'חש/ה פאניקה', subscale: 'fear' },
-  { id: 'anger_5', label: 'מתרגז/ת', subscale: 'anger' },
-  { id: 'disgust_5', label: 'מתועב/ת', subscale: 'disgust' },
-  { id: 'sad_5', label: 'חש/ה ריקנות', subscale: 'sadness' }
+  { id: 'fear_1',    label: 'מפוחד/ת',       subscale: 'fear' },
+  { id: 'fear_2',    label: 'חש/ה פחד',       subscale: 'fear' },
+  { id: 'fear_3',    label: 'חושש/ת',         subscale: 'fear' },
+  { id: 'fear_4',    label: 'חש/ה פאניקה',    subscale: 'fear' },
+  { id: 'anger_1',   label: 'כועס/ת',         subscale: 'anger' },
+  { id: 'anger_2',   label: 'זועם/ת',         subscale: 'anger' },
+  { id: 'anger_3',   label: 'מתמרמר/ת',       subscale: 'anger' },
+  { id: 'anger_4',   label: 'נסער/ת',         subscale: 'anger' },
+  { id: 'disgust_1', label: 'חש/ה בחילה',     subscale: 'disgust' },
+  { id: 'disgust_2', label: 'חש/ה דחייה',     subscale: 'disgust' },
+  { id: 'disgust_3', label: 'סולד/ת',         subscale: 'disgust' },
+  { id: 'disgust_4', label: 'נגעל/ת',         subscale: 'disgust' },
+  { id: 'sad_1',     label: 'עצוב/ה',         subscale: 'sadness' },
+  { id: 'sad_2',     label: 'שבור/ה',         subscale: 'sadness' },
+  { id: 'sad_3',     label: 'נכאב/ת',         subscale: 'sadness' },
+  { id: 'sad_4',     label: 'חש/ה ריקנות',    subscale: 'sadness' }
 ];
 
 // ==================== FILLER WORDS ====================
 const fillerWords = [
-  { prefix: 'ספ', suffix: '', hint: 'ספ___' },
-  { prefix: 'מח', suffix: '', hint: 'מח___' },
-  { prefix: 'דל', suffix: '', hint: 'דל___' },
-  { prefix: 'שמ', suffix: '', hint: 'שמ___' },
-  { prefix: 'גל', suffix: '', hint: 'גל___' },
-  { prefix: 'פר', suffix: '', hint: 'פר___' },
-  { prefix: 'תק', suffix: '', hint: 'תק___' },
-  { prefix: 'חל', suffix: '', hint: 'חל___' },
-  { prefix: 'מש', suffix: '', hint: 'מש___' },
-  { prefix: 'בר', suffix: '', hint: 'בר___' }
+  { prefix: 'ש', suffix: 'ן' },
+  { prefix: 'ת', suffix: 'ז' },
+  { prefix: 'מ', suffix: 'ת' },
+  { prefix: 'ח', suffix: 'ן' },
+  { prefix: 'ק', suffix: 'ר' },
+  { prefix: 'כ', suffix: 'ב' },
+  { prefix: 'נ', suffix: 'ר' },
+  { prefix: 'פ', suffix: 'ח' },
+  { prefix: 'ר', suffix: 'ח' },
+  { prefix: 'ש', suffix: 'ה' },
+  { prefix: 'ג', suffix: 'ה' },
+  { prefix: 'ס', suffix: 'ד' }
 ];
 
 // ==================== SIMULATION STEPS ====================
@@ -633,6 +631,7 @@ let simResponses = [];
 let simStartTime = null;
 let stepStartTime = null;
 let inProd = false;
+let breakingPoint = null;
 
 // ==================== PHASE NAVIGATION ====================
 function goTo(id) {
@@ -726,7 +725,7 @@ function buildDEQ() {
     <div class="deq-item">
       <div class="deq-label">${item.label}</div>
       <div class="deq-scale">
-        ${[1,2,3,4,5].map(v => `
+        ${[1,2,3,4,5,6,7].map(v => `
           <label class="deq-radio">
             <input type="radio" name="deq_${item.id}" value="${v}">
             <span class="dot">${v}</span>
@@ -773,8 +772,9 @@ function buildFiller() {
   container.innerHTML = fillerWords.map((w, i) => `
     <div class="filler-word">
       <span style="width:30px;color:var(--muted);font-size:13px">${i + 1}.</span>
-      <span style="font-weight:600;direction:rtl">${w.prefix}</span>
-      <input type="text" id="filler_${i}" maxlength="10" placeholder="___">
+      <span style="font-weight:700;font-size:18px">${w.prefix}</span>
+      <input type="text" id="filler_${i}" maxlength="8" placeholder="___" style="width:120px">
+      <span style="font-weight:700;font-size:18px">${w.suffix}</span>
     </div>
   `).join('');
 }
@@ -783,7 +783,7 @@ function submitFiller() {
   const fillerData = {};
   fillerWords.forEach((w, i) => {
     const val = document.getElementById(`filler_${i}`).value.trim();
-    fillerData[`word_${i + 1}`] = { prefix: w.prefix, completion: val, full: w.prefix + val };
+    fillerData[`word_${i + 1}`] = { prefix: w.prefix, suffix: w.suffix, completion: val, full: w.prefix + val + w.suffix };
   });
   DATA.phase_timestamps.filler_end = new Date().toISOString();
   DATA.filler = fillerData;
@@ -911,6 +911,7 @@ function simAction(idx, action) {
     updateProgress();
     setTimeout(() => showSimStep(idx + 1), 1500);
   } else {
+    breakingPoint = idx + 1;
     addMsg(c, 'sys', '', '✋ סירבת לבצע את ההנחיה. הסימולציה הסתיימה.');
     simStep = idx + 1;
     updateProgress();
@@ -923,6 +924,7 @@ function endSim() {
   DATA.phase_timestamps.sim_end = new Date().toISOString();
   DATA.simulation = {
     compliance_score: score,
+    breaking_point: breakingPoint !== null ? breakingPoint : 11,
     max_possible: 10,
     compliance_rate: (score / 10 * 100).toFixed(1) + '%',
     prods_received: simResponses.filter(r => r.received_prod).length,
