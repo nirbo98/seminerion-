@@ -979,7 +979,35 @@ function saveToSheets() {
   if (!SHEETS_WEBHOOK_URL) return Promise.resolve({ status: 'skipped' });
   return new Promise((resolve) => {
     try {
-      const url = SHEETS_WEBHOOK_URL + '?payload=' + encodeURIComponent(JSON.stringify(DATA));
+      // שולחים רק נתונים רלוונטיים לניתוח (ללא טקסט עברי ארוך)
+      const sim = DATA.simulation || {};
+      const deq = (DATA.deq && DATA.deq.items) || {};
+      const sub = (DATA.deq && DATA.deq.subscales) || {};
+      const dem = DATA.demographics || {};
+      const mc = DATA.manipulation_check || {};
+      const ts = DATA.phase_timestamps || {};
+      const steps = (sim.steps || []).map(s => ({ step: s.step, action: s.action, prod: s.received_prod, rt: s.reaction_time_ms }));
+
+      const payload = {
+        id: DATA.participant_id,
+        ts_start: DATA.timestamp_start,
+        ts_end: DATA.timestamp_end,
+        age: dem.age, gender: dem.gender, survivor: dem.survivor_relation,
+        memorial: dem.memorial_visit,
+        fear_1: deq.fear_1, fear_2: deq.fear_2, fear_3: deq.fear_3, fear_4: deq.fear_4, fear_mean: sub.fear_mean,
+        anger_1: deq.anger_1, anger_2: deq.anger_2, anger_3: deq.anger_3, anger_4: deq.anger_4, anger_mean: sub.anger_mean,
+        disgust_1: deq.disgust_1, disgust_2: deq.disgust_2, disgust_3: deq.disgust_3, disgust_4: deq.disgust_4, disgust_mean: sub.disgust_mean,
+        sad_1: deq.sad_1, sad_2: deq.sad_2, sad_3: deq.sad_3, sad_4: deq.sad_4, sadness_mean: sub.sadness_mean,
+        steps: steps,
+        compliance: sim.compliance_score,
+        breaking_point: sim.breaking_point,
+        sim_dur: sim.total_duration_sec,
+        manip_impact: mc.photo_impact,
+        manip_connection: mc.suspected_connection,
+        deq_dur: ts.deq_start && ts.deq_end ? ((new Date(ts.deq_end)-new Date(ts.deq_start))/1000).toFixed(1) : null
+      };
+
+      const url = SHEETS_WEBHOOK_URL + '?payload=' + encodeURIComponent(JSON.stringify(payload));
       const img = new Image();
       img.onload = img.onerror = () => resolve({ status: 'sent' });
       img.src = url;
