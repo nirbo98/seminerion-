@@ -210,7 +210,7 @@ p,.desc{font-size:16px;color:var(--text);line-height:1.8;margin-bottom:14px}
 <div class="wrap">
   <div class="card">
     <div class="label">שאלה ראשונה (1 מתוך 1)</div>
-    <h3 style="font-size:17px;line-height:1.7;margin-bottom:24px">בשבועיים האחרונים, באיזו תכיפות הטרידו אותך מחשבות שמוטב היה לך מת/ה, או על פגיעה עצמית בדרך כלשהי?</h3>
+    <h3 style="font-size:17px;line-height:1.7;margin-bottom:24px">בשבועיים האחרונים, באיזו תכיפות הטרידו אותך מחשבות שמוטב היה לך לו היית מת/ה, או מחשבות לפגוע בעצמך בדרך כלשהי?</h3>
     <div class="radio-block">
       <label class="radio-row"><input type="radio" name="phq9" value="0" onchange="updatePhq9Btn()"><span>כלל לא</span></label>
       <label class="radio-row"><input type="radio" name="phq9" value="1" onchange="updatePhq9Btn()"><span>מספר ימים</span></label>
@@ -228,9 +228,9 @@ p,.desc{font-size:16px;color:var(--text);line-height:1.8;margin-bottom:14px}
 <div class="phase" id="phase-screen-out">
 <div class="wrap">
   <div class="card">
-    <h2>תודה על השתתפותך עד כאן</h2>
-    <p>נתקלנו בתשובה שהובילה לסיום מוקדם של ההשתתפות במחקר. זה לא קשור לאיכות התשובות שלך - יש לנו מספר קריטריונים מתודולוגיים שלפיהם חלק מהמשתתפים פונים למסלול אחר.</p>
-    <p><strong>מה שכן חשוב לנו לומר:</strong><br>אם המחשבות שתיארת מטרידות אותך, יש מי שיוכל לעזור. אנחנו לא יודעים מי את/ה - אבל אנחנו רוצים שתדע/י שלא צריך להתמודד עם זה לבד.</p>
+    <h2>תודה רבה על הכוונה</h2>
+    <p>הגענו למכסת התשובות נכון לשעה זו. אנחנו מעריכים מאוד את נכונותך להשתתף.</p>
+    <p>אם אחת השאלות בשאלון עד כה עוררה אצלך מצוקה - יש למי לפנות. אינך לבד.</p>
     <div class="support-box">
       <div style="font-weight:700;margin-bottom:10px">מקורות תמיכה זמינים:</div>
       <strong>ער"ן (עזרה ראשונה נפשית) - 1201</strong>
@@ -269,22 +269,22 @@ p,.desc{font-size:16px;color:var(--text);line-height:1.8;margin-bottom:14px}
   <div class="card">
     <h2>משימת כתיבה קצרה</h2>
     <p>לפניך שתי שאלות פתוחות. אנא ענה/י עליהן בכנות, מתוך תחושה אישית. אין תשובה נכונה או שגויה. המשימה היא חלק מהבדיקה התיאורטית של תהליכי קבלת החלטות.</p>
+    <div class="note-box"><strong>שים/י לב:</strong> נדרש מינימום של 20 מילים בכל אחת מהשאלות כדי להמשיך.</div>
 
     <div class="write-question" style="margin-top:24px">
       <div class="qnum">שאלה 1 מתוך 2</div>
       <h3 id="writeQ1Text"></h3>
       <textarea id="writeQ1" rows="8" placeholder="כתוב/י כאן את התגובה שלך..." oninput="updateWriteState()"></textarea>
-      <div class="char-count" id="writeQ1Count">0 / 50 תווים</div>
+      <div class="char-count" id="writeQ1Count">0 / 20 מילים</div>
     </div>
 
     <div class="write-question">
       <div class="qnum">שאלה 2 מתוך 2</div>
       <h3 id="writeQ2Text"></h3>
       <textarea id="writeQ2" rows="8" placeholder="כתוב/י כאן את התגובה שלך..." oninput="updateWriteState()"></textarea>
-      <div class="char-count" id="writeQ2Count">0 / 50 תווים</div>
+      <div class="char-count" id="writeQ2Count">0 / 20 מילים</div>
     </div>
 
-    <div class="write-timer" id="writeTimer">המשך זמין בעוד 120 שניות</div>
     <div class="btn-center-wrap">
       <button class="btn btn-primary" id="writeBtn" onclick="submitWrite()" disabled>להמשיך</button>
     </div>
@@ -297,7 +297,7 @@ p,.desc{font-size:16px;color:var(--text);line-height:1.8;margin-bottom:14px}
 <div class="wrap">
   <div class="card">
     <h2>השלמת מילים</h2>
-    <p>לפניך 10 רצפי אותיות עם אותיות חסרות. בכל פריט, השלם/י את הרצף למילה עברית מלאה ותקנית. אם עולות לך כמה אפשרויות - בחר/י את המילה הראשונה שעולה לך.</p>
+    <p>לפניך 10 מילים בעברית עם אות אחת חסרה (במקום הקו התחתון). אנא כתוב/י את המילה השלמה בשדה שלצד כל פריט. אם עולות לך כמה אפשרויות - בחר/י את הראשונה שעולה לך.</p>
     <p class="subtle">אין תשובה נכונה או שגויה. המשימה בודקת תהליכי שליפה לקסיקלית (אוצר מילים).</p>
     <div id="fillerItems" style="margin-top:18px"></div>
     <div class="btn-center-wrap">
@@ -576,14 +576,11 @@ p,.desc{font-size:16px;color:var(--text);line-height:1.8;margin-bottom:14px}
 <!-- ==================== SCREEN 22: RESULTS ==================== -->
 <div class="phase" id="phase-results">
 <div class="wrap">
-  <div class="card">
-    <h2 class="center">תודה על השתתפותך!</h2>
-    <div class="score-big">
-      <div class="num" id="finalScore">—</div>
-      <div class="lbl">ציון ציות ממוצע (1-7, מתוך 8 שלבים)</div>
-    </div>
-    <div id="resultsSummary"></div>
-    <div id="saveStatus" style="margin-top:14px;text-align:center;font-size:13px;color:var(--muted)"></div>
+  <div class="card center" style="padding:48px 32px">
+    <div style="font-size:48px;margin-bottom:8px">✓</div>
+    <h2 style="margin-bottom:14px">תודה על השתתפותך!</h2>
+    <p style="font-size:16px">תרומתך למחקר תועדה בהצלחה. את/ה יכול/ה לסגור את החלון בכל עת.</p>
+    <div id="saveStatus" style="margin-top:24px;font-size:13px;color:var(--muted)"></div>
   </div>
 </div>
 </div>
@@ -618,9 +615,9 @@ const DATA = {
 
   // Manipulation (writing task)
   ms_question1_text: null, ms_question2_text: null,
-  ms_question1_char_count: null, ms_question2_char_count: null,
+  ms_question1_word_count: null, ms_question2_word_count: null,
   control_question1_text: null, control_question2_text: null,
-  control_question1_char_count: null, control_question2_char_count: null,
+  control_question1_word_count: null, control_question2_word_count: null,
   manipulation_total_duration: null,
 
   // Filler
@@ -693,18 +690,18 @@ const deqItems = [
   { id: 'sad_4',     label: 'ייאוש',         subscale: 'sadness' }
 ];
 
-// ==================== WORD STEMS (10 items per protocol) ====================
+// ==================== WORD STEMS (10 simple, neutral items) ====================
 const STEM_WORDS = [
-  'ס _ פ _ ר',
-  'ש _ ל ח _ ן',
-  'מ _ ש _ ר ד',
-  'צ _ ב _',
-  'כ _ ס _ א',
-  'מ _ ט פ _ ת',
-  'ח _ ל _ ן',
-  'ע פ _ ר _ ן',
-  'ש מ _ י _',
-  'פ _ ר _'
+  'ש _ ל ח ן',
+  'כ _ ס א',
+  'מ ט _ ס',
+  'ש ק _ ת',
+  'ח ת _ ל',
+  'ת מ _ נ ה',
+  'ת _ נ ו ק',
+  'ע ג _ ה',
+  'ר כ _ ת',
+  'ש ע _ ן'
 ];
 
 // ==================== WRITING TASK QUESTIONS ====================
@@ -789,18 +786,33 @@ function goTo(id) {
 }
 
 // ==================== CONDITION ASSIGNMENT ====================
+const COND_STORAGE_KEY = 'mscc_condition_v1';
 let _conditionReady = false;
+function persistCondition(cond) {
+  DATA.condition = cond;
+  _conditionReady = true;
+  try { localStorage.setItem(COND_STORAGE_KEY, cond); } catch (e) {}
+}
 (function assignCondition() {
   const url = new URLSearchParams(window.location.search);
   const c = url.get('cond') || url.get('c');
-  if (c === 'MS' || c === 'e') { DATA.condition = 'MS'; _conditionReady = true; return; }
-  if (c === 'control' || c === 'k') { DATA.condition = 'control'; _conditionReady = true; return; }
+  if (c === 'MS' || c === 'e') { persistCondition('MS'); return; }
+  if (c === 'control' || c === 'k') { persistCondition('control'); return; }
+
+  // Check localStorage first — survives page refresh, keeps participant in same group
+  try {
+    const stored = localStorage.getItem(COND_STORAGE_KEY);
+    if (stored === 'MS' || stored === 'control') {
+      DATA.condition = stored;
+      _conditionReady = true;
+      return;
+    }
+  } catch (e) {}
 
   window.addEventListener('message', function handler(e) {
     if (e.data && typeof e.data.count === 'number') {
       window.removeEventListener('message', handler);
-      DATA.condition = (e.data.count % 2 === 0) ? 'MS' : 'control';
-      _conditionReady = true;
+      persistCondition((e.data.count % 2 === 0) ? 'MS' : 'control');
     }
   });
 
@@ -813,8 +825,7 @@ let _conditionReady = false;
 
   setTimeout(function() {
     if (!_conditionReady) {
-      DATA.condition = Math.random() < 0.5 ? 'MS' : 'control';
-      _conditionReady = true;
+      persistCondition(Math.random() < 0.5 ? 'MS' : 'control');
     }
   }, 4000);
 })();
@@ -843,9 +854,10 @@ function submitPhq9() {
   const sel = document.querySelector('input[name="phq9"]:checked');
   const v = parseInt(sel.value);
   DATA.phq9_item9_response = v;
-  if (v >= 1) {
+  if (v >= 2) {
     DATA.excluded_at_screening = true;
     DATA.completion_status = 'excluded';
+    try { localStorage.removeItem(COND_STORAGE_KEY); } catch (e) {}
     goTo('phase-screen-out');
     saveToSheets();
   } else {
@@ -919,9 +931,14 @@ function submitStaiPost() {
 }
 
 // ==================== SCREEN 6: WRITING TASK ====================
+const WRITE_MIN_WORDS = 20;
 let _writeStartTime = null;
-let _writeTimerInt = null;
 let _writeReady = false;
+function countWords(s) {
+  const trimmed = s.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+}
 function initWrite() {
   if (!_conditionReady) {
     setTimeout(initWrite, 100);
@@ -934,55 +951,43 @@ function initWrite() {
   _writeReady = false;
   document.getElementById('writeQ1').value = '';
   document.getElementById('writeQ2').value = '';
-  if (_writeTimerInt) clearInterval(_writeTimerInt);
-  _writeTimerInt = setInterval(updateWriteState, 500);
   updateWriteState();
 }
 
 function updateWriteState() {
   const q1 = document.getElementById('writeQ1').value;
   const q2 = document.getElementById('writeQ2').value;
-  const c1 = q1.length;
-  const c2 = q2.length;
+  const w1 = countWords(q1);
+  const w2 = countWords(q2);
   const cnt1 = document.getElementById('writeQ1Count');
   const cnt2 = document.getElementById('writeQ2Count');
-  cnt1.textContent = c1 + ' / 50 תווים';
-  cnt2.textContent = c2 + ' / 50 תווים';
-  cnt1.classList.toggle('ok', c1 >= 50);
-  cnt2.classList.toggle('ok', c2 >= 50);
+  cnt1.textContent = w1 + ' / ' + WRITE_MIN_WORDS + ' מילים';
+  cnt2.textContent = w2 + ' / ' + WRITE_MIN_WORDS + ' מילים';
+  cnt1.classList.toggle('ok', w1 >= WRITE_MIN_WORDS);
+  cnt2.classList.toggle('ok', w2 >= WRITE_MIN_WORDS);
 
-  const elapsed = _writeStartTime ? (Date.now() - _writeStartTime) / 1000 : 0;
-  const remaining = Math.max(0, Math.ceil(120 - elapsed));
-  const timerEl = document.getElementById('writeTimer');
-  if (remaining > 0) {
-    timerEl.textContent = 'המשך זמין בעוד ' + remaining + ' שניות';
-    timerEl.classList.remove('ready');
-  } else {
-    timerEl.textContent = 'המשך אפשרי';
-    timerEl.classList.add('ready');
-  }
-
-  const ready = (remaining === 0) && (c1 >= 50) && (c2 >= 50);
+  const ready = (w1 >= WRITE_MIN_WORDS) && (w2 >= WRITE_MIN_WORDS);
   _writeReady = ready;
   document.getElementById('writeBtn').disabled = !ready;
 }
 
 function submitWrite() {
   if (!_writeReady) return;
-  if (_writeTimerInt) { clearInterval(_writeTimerInt); _writeTimerInt = null; }
   const q1 = document.getElementById('writeQ1').value;
   const q2 = document.getElementById('writeQ2').value;
+  const w1 = countWords(q1);
+  const w2 = countWords(q2);
   const dur = ((Date.now() - _writeStartTime) / 1000).toFixed(1);
   if (DATA.condition === 'MS') {
     DATA.ms_question1_text = q1;
     DATA.ms_question2_text = q2;
-    DATA.ms_question1_char_count = q1.length;
-    DATA.ms_question2_char_count = q2.length;
+    DATA.ms_question1_word_count = w1;
+    DATA.ms_question2_word_count = w2;
   } else {
     DATA.control_question1_text = q1;
     DATA.control_question2_text = q2;
-    DATA.control_question1_char_count = q1.length;
-    DATA.control_question2_char_count = q2.length;
+    DATA.control_question1_word_count = w1;
+    DATA.control_question2_word_count = w2;
   }
   DATA.manipulation_total_duration = dur;
   goTo('phase-filler');
@@ -996,7 +1001,7 @@ function buildFiller() {
     <div class="stem-word">
       <span class="stem-num">${i + 1}.</span>
       <span class="stem-display">${stem}</span>
-      <input type="text" id="stem_${i}" maxlength="30">
+      <input type="text" id="stem_${i}" maxlength="20" placeholder="המילה השלמה">
     </div>
   `).join('');
 }
@@ -1275,24 +1280,7 @@ function submitDemo() {
 function showResults() {
   DATA.timestamp_complete = new Date().toISOString();
   DATA.completion_status = 'complete';
-
-  document.getElementById('finalScore').textContent = DATA.mean_compliance_score || '—';
-
-  const summary = document.getElementById('resultsSummary');
-  const stepRows = [];
-  for (let i = 1; i <= 8; i++) {
-    const s = DATA.steps['step' + i];
-    if (s) stepRows.push(`<div class="result-row"><span>שלב ${i}</span><strong>${s.score}/7${s.prod_triggered ? ' (לחץ)' : ''}</strong></div>`);
-  }
-  summary.innerHTML = `
-    <div class="result-row"><span>קבוצה</span><strong>${DATA.condition || '—'}</strong></div>
-    <div class="result-row"><span>STAI-6 לפני</span><strong>${DATA.stai6_pre_score || '—'}</strong></div>
-    <div class="result-row"><span>STAI-6 אחרי</span><strong>${DATA.stai6_post_score || '—'}</strong></div>
-    <div class="result-row"><span>שינוי STAI</span><strong>${DATA.stai6_change_score || '—'}</strong></div>
-    <div class="result-row"><span>ציות ממוצע (8 שלבים)</span><strong>${DATA.mean_compliance_score || '—'}</strong></div>
-    <div class="result-row"><span>סה"כ לחצים</span><strong>${DATA.prods_total_count}</strong></div>
-    ${stepRows.join('')}
-  `;
+  try { localStorage.removeItem(COND_STORAGE_KEY); } catch (e) {}
 
   goTo('phase-results');
 
@@ -1341,10 +1329,10 @@ function saveToSheets() {
         stai_post_dur: DATA.stai6_post_duration,
         stai_change: DATA.stai6_change_score,
 
-        ms_q1_chars: DATA.ms_question1_char_count,
-        ms_q2_chars: DATA.ms_question2_char_count,
-        control_q1_chars: DATA.control_question1_char_count,
-        control_q2_chars: DATA.control_question2_char_count,
+        ms_q1_words: DATA.ms_question1_word_count,
+        ms_q2_words: DATA.ms_question2_word_count,
+        control_q1_words: DATA.control_question1_word_count,
+        control_q2_words: DATA.control_question2_word_count,
         ms_q1_text: (DATA.ms_question1_text || '').slice(0, 500),
         ms_q2_text: (DATA.ms_question2_text || '').slice(0, 500),
         control_q1_text: (DATA.control_question1_text || '').slice(0, 500),
